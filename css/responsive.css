@@ -1,0 +1,613 @@
+/* 
+ * Responsive Design Enhancement for Plug&Save
+ * This file provides additional responsive design rules to ensure
+ * the website displays correctly on all devices from mobile to desktop
+ * Following UI/UX best practices for responsive design
+ */
+
+/* Base responsive viewport setting */
+@viewport {
+  width: device-width;
+  zoom: 1.0;
+}
+
+/* Global accessibility and usability improvements */
+:root {
+  /* Improved touch target variables */
+  --touch-target-size: 44px;
+  --min-touch-target: 44px;
+  
+  /* Spacing variables for consistency */
+  --spacing-xs: 5px;
+  --spacing-sm: 10px;
+  --spacing-md: 15px;
+  --spacing-lg: 25px;
+  --spacing-xl: 40px;
+}
+
+/* Focus states for better accessibility */
+a:focus, button:focus, input:focus, select:focus, textarea:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Improved text readability */
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Index page specific styles - target the index page welcome text */
+.container .left-panel h2:first-of-type,
+.container .left-panel p:first-of-type {
+  transition: all 0.3s ease;
+}
+
+/* Logo and header styling improvements */
+.logo {
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.logo .icon {
+  flex-shrink: 0;
+}
+
+.logo h1 {
+  margin-left: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+  padding-bottom: 2px;
+}
+
+/* Card and container improvements */
+.card, .dashboard-card, .device-card, .report-card {
+  transition: all 0.2s ease;
+  border-radius: var(--radius-md);
+}
+
+/* Improved button styling */
+button, .btn, .action-button, .nav-button {
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  min-height: var(--min-touch-target);
+}
+
+button:hover, .btn:hover, .action-button:hover, .nav-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+button:active, .btn:active, .action-button:active, .nav-button:active {
+  transform: translateY(1px);
+}
+
+/* Form element improvements */
+input, select, textarea {
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+  border: 1px solid #ddd;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+/* Desktop (1200px and above) */
+@media (min-width: 1200px) {
+  /* Optimize for larger screens */
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  /* Improve readability on large screens */
+  p, li {
+    line-height: 1.7;
+  }
+  
+  /* Enhanced card layouts for desktop */
+  .dashboard-card, .device-card, .report-card {
+    flex: 0 0 calc(33.333% - 20px);
+    transition: all 0.3s ease;
+  }
+  
+  .dashboard-card:hover, .device-card:hover, .report-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  /* Improved spacing for desktop */
+  .content-area {
+    padding: 30px;
+  }
+}
+
+/* Tablet Landscape (1024px and below) */
+@media (max-width: 1024px) {
+  /* Adjust card layouts for better tablet viewing */
+  .dashboard-card, .device-card, .report-card {
+    flex: 0 0 calc(50% - 20px);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  /* Adjust font sizes for better readability */
+  h1 {
+    font-size: 28px;
+  }
+  
+  h2 {
+    font-size: 24px;
+  }
+  
+  /* Ensure tables are responsive */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  }
+  
+  /* Logo and header adjustments */
+  .logo {
+    justify-content: flex-start;
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .logo .icon {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .logo h1 {
+    font-size: 26px;
+  }
+  
+  /* Index page - move welcome text to bottom */
+  .container .left-panel {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Target index page welcome message */
+  .container .left-panel h2:first-of-type,
+  .container .left-panel p:first-of-type {
+    order: 2;
+    margin-top: 30px;
+    text-align: center;
+  }
+  
+  .container .left-panel .logo {
+    order: 1;
+  }
+  
+  /* Improved form elements for tablet */
+  input, select, textarea {
+    font-size: 16px;
+    padding: 12px;
+  }
+  
+  /* Better spacing for content */
+  .content-area, .card-content {
+    padding: 20px;
+  }
+  
+  /* Improved button sizing for touch */
+  button, .btn, .action-button, .nav-button {
+    padding: 12px 20px;
+  }
+}
+
+/* Tablet Portrait (768px and below) */
+@media (max-width: 768px) {
+  /* Adjust card layouts for tablet portrait */
+  .dashboard-card, .device-card, .report-card {
+    flex: 0 0 100%;
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  /* Make sure forms are properly sized */
+  form {
+    max-width: 100%;
+  }
+  
+  /* Adjust spacing for better touch targets */
+  button, .nav-button, .action-button {
+    padding: 12px 16px;
+    margin-bottom: var(--spacing-sm);
+    width: 100%; /* Full width buttons on mobile for better touch targets */
+  }
+  
+  /* Ensure adequate spacing between form elements */
+  .form-group {
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  /* Adjust charts and graphs for smaller screens */
+  canvas, .chart-container {
+    max-width: 100%;
+    height: auto !important;
+  }
+  
+  /* Logo and header adjustments for tablet */
+  .logo {
+    justify-content: center;
+    margin-bottom: var(--spacing-md) !important;
+    padding: 10px 0;
+    width: 100%;
+  }
+  
+  .logo .icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .logo h1 {
+    font-size: 24px;
+    margin-left: 10px;
+  }
+  
+  /* Index page - move welcome text to bottom */
+  .container {
+    flex-direction: column-reverse;
+  }
+  
+  /* Only for index page - restore normal direction for other pages */
+  body:not(.index-page) .container {
+    flex-direction: column;
+  }
+  
+  /* Add this class to index.html */
+  .index-welcome-text {
+    margin-top: var(--spacing-lg);
+    text-align: center;
+    order: 2;
+  }
+  
+  /* Fix for left panel content in mobile view */
+  .left-panel {
+    padding-top: var(--spacing-lg) !important;
+    width: 100%;
+    height: auto;
+    position: relative;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .left-panel h2 {
+    font-size: 22px;
+    text-align: center;
+    clear: both;
+  }
+  
+  .left-panel p {
+    text-align: center;
+    margin-top: var(--spacing-md);
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  
+  /* Improved navigation for mobile */
+  .nav-list {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .nav-item {
+    margin: 5px 0;
+    width: 100%;
+  }
+  
+  /* Improved form layout for mobile */
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  
+  input, select, textarea {
+    width: 100%;
+    margin-bottom: var(--spacing-md);
+  }
+  
+  /* Improved table display for mobile */
+  table, th, td {
+    font-size: 14px;
+  }
+  
+  th, td {
+    padding: 10px 8px;
+  }
+}
+
+/* Large Mobile (576px and below) */
+@media (max-width: 576px) {
+  /* Further reduce heading sizes */
+  h1 {
+    font-size: 24px;
+  }
+  
+  h2 {
+    font-size: 20px;
+  }
+  
+  h3 {
+    font-size: 18px;
+  }
+  
+  /* Adjust padding for content areas */
+  .content-area, .card-content {
+    padding: var(--spacing-md);
+  }
+  
+  /* Stack horizontal elements */
+  .flex-row, .button-group {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  
+  /* Ensure adequate touch targets for mobile */
+  button, .nav-button, .action-button, select, input[type="checkbox"], input[type="radio"] {
+    min-height: var(--min-touch-target); /* Apple's recommended minimum touch target size */
+  }
+  
+  /* Logo and header adjustments for mobile */
+  .logo {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--spacing-md) !important;
+    padding: 5px 0;
+  }
+  
+  .logo .icon {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .logo h1 {
+    font-size: 22px;
+    margin-left: 8px;
+  }
+  
+  /* Fix for left panel content in small mobile view */
+  .left-panel {
+    padding: var(--spacing-lg) var(--spacing-md) !important;
+  }
+  
+  .left-panel h2 {
+    margin-top: var(--spacing-md);
+    font-size: 20px;
+  }
+  
+  .left-panel p {
+    font-size: 14px;
+    margin: var(--spacing-md) 0;
+  }
+  
+  /* Improved card display for mobile */
+  .card, .dashboard-card, .device-card, .report-card {
+    margin-bottom: var(--spacing-md);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  /* Better spacing for mobile forms */
+  .form-group {
+    margin-bottom: var(--spacing-md);
+  }
+  
+  /* Improved button spacing */
+  .button-group {
+    margin-top: var(--spacing-md);
+  }
+  
+  /* Better handling of long text */
+  p, li, td, th {
+    word-break: break-word;
+  }
+}
+
+/* Small Mobile (480px and below) */
+@media (max-width: 480px) {
+  /* Minimize padding to maximize content space */
+  .container, .card, .panel {
+    padding: var(--spacing-sm);
+  }
+  
+  /* Further adjustments for very small screens */
+  .logo h1 {
+    font-size: 20px;
+  }
+  
+  .logo .icon {
+    width: 30px;
+    height: 30px;
+  }
+  
+  /* Hide decorative elements on very small screens */
+  .decorative-only {
+    display: none;
+  }
+  
+  /* Ensure form labels are above inputs rather than beside them */
+  label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+  }
+  
+  /* Ensure inputs have adequate size for touch */
+  input, select, textarea {
+    font-size: 16px; /* Prevents iOS zoom on focus */
+    padding: 10px;
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  /* Additional fixes for very small screens */
+  .left-panel {
+    padding: var(--spacing-lg) var(--spacing-sm) !important;
+  }
+  
+  .left-panel h2 {
+    font-size: 18px;
+    margin-top: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .left-panel p {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  
+  /* Simplified UI for very small screens */
+  .secondary-content {
+    display: none;
+  }
+  
+  /* Compact tables for very small screens */
+  th, td {
+    padding: 8px 5px;
+    font-size: 13px;
+  }
+  
+  /* Improved button sizing */
+  button, .btn, .action-button, .nav-button {
+    padding: 10px 15px;
+    font-size: 14px;
+  }
+}
+
+/* Fix for device orientation changes */
+@media screen and (orientation: portrait) {
+  /* Adjustments specific to portrait orientation */
+  .chart-container {
+    height: 300px !important;
+  }
+  
+  /* Better spacing for portrait mode */
+  .container {
+    padding: var(--spacing-sm);
+  }
+}
+
+@media screen and (orientation: landscape) and (max-width: 768px) {
+  /* Adjustments specific to landscape orientation on smaller devices */
+  .left-panel {
+    height: auto;
+    min-height: 80px;
+    padding: var(--spacing-lg) !important;
+  }
+  
+  .chart-container {
+    height: 200px !important;
+  }
+  
+  /* Fix for landscape mode on mobile */
+  .logo {
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: var(--spacing-md) !important;
+  }
+  
+  .logo h1 {
+    margin-left: 10px;
+    margin-top: 0;
+  }
+  
+  .left-panel h2, .left-panel p {
+    text-align: center;
+    clear: both;
+    margin-top: var(--spacing-sm);
+  }
+  
+  /* Index page in landscape */
+  body.index-page .container {
+    flex-direction: row;
+  }
+  
+  body.index-page .left-panel,
+  body.index-page .right-panel {
+    width: 50%;
+  }
+  
+  /* Better form layout in landscape */
+  .form-row {
+    display: flex;
+    gap: var(--spacing-md);
+  }
+  
+  .form-row .form-group {
+    flex: 1;
+  }
+}
+
+/* High-DPI screens (Retina displays, etc.) */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* Ensure SVGs and icons look crisp on high-DPI screens */
+  .logo-svg, .icon-svg {
+    transform: scale(1);
+  }
+  
+  /* Sharper text rendering for high-DPI screens */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .dark-mode-support {
+    /* These styles will only apply if the user has dark mode enabled and the app supports it */
+    background-color: #121212;
+    color: #f0f0f0;
+  }
+}
+
+/* Print styles for reports */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    font-size: 12pt;
+    background: #fff;
+    color: #000;
+  }
+  
+  .container {
+    display: block;
+  }
+  
+  .left-panel {
+    display: none;
+  }
+  
+  .right-panel {
+    margin-left: 0;
+    width: 100%;
+  }
+  
+  /* Ensure tables print properly */
+  table {
+    page-break-inside: avoid;
+    width: 100%;
+  }
+  
+  /* Improve print quality */
+  img, svg {
+    max-width: 100% !important;
+  }
+  
+  a[href]:after {
+    content: " (" attr(href) ")";
+    font-size: 90%;
+  }
+}

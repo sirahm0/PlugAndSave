@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+
+<html dir="ltr" lang="EN">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+    <link href="css/common.css" rel="stylesheet" />
+    <link href="css/profile.css" rel="stylesheet" />
+    <link href="css/preloader.css" rel="stylesheet" />
+    <link href="css/responsive.css" rel="stylesheet" />
+    <link href="css/sidebar.css" rel="stylesheet" />
+    <link href="css/header.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="js/auth.js?v=2"></script>
+    <script type="module" src="js/profile.js?v=2"></script>
+    <script type="module" src="js/config.js"></script>
+    <title>User Profile - Plug&amp;Save</title>
+</head>
+
+<body class="profile-page">
+    <div class="preloader">
+        <div class="preloader-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="preloader-svg">
+                <path class="preloader-path" d="M10.5 1L2 12h7l-1 11L18 12h-7l1-11z" fill="none" stroke="#4CAF50" stroke-width="1.5" />
+            </svg>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <button id="menu-toggle" class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="page-title">Profile</div>
+        </div>
+        <div class="header-right">
+            <div class="header-logo">
+                <a href="dashboard.html" class="logo-link">
+                    <div class="icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 28 28" class="logo-svg">
+                            <path d="M10.5 1L2 12h7l-1 11L18 12h-7l1-11z" fill="none" stroke="#4CAF50" stroke-width="1.5" />
+                        </svg>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 28 28" class="logo-svg">
+                        <path d="M10.5 1L2 12h7l-1 11L18 12h-7l1-11z" fill="none" stroke="#4CAF50" stroke-width="1.5" />
+                    </svg>
+                </div>
+                <h1>Plug&amp;Save</h1>
+            </div>
+        </div>
+        <div class="sidebar-menu">
+            <a href="dashboard.html" class="sidebar-menu-item">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="addDevice.html" class="sidebar-menu-item">
+                <i class="fas fa-plus-circle"></i>
+                <span>Add Device</span>
+            </a>
+            <a href="report.html" class="sidebar-menu-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reports</span>
+            </a>
+            <a href="chat-assistant.html" class="sidebar-menu-item">
+                <i class="fas fa-robot"></i>
+                <span>AI Assistant</span>
+            </a>
+            <a href="profile.html" class="sidebar-menu-item active">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="dashboard-content">
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h2>Your Profile</h2>
+                    </div>
+                    
+                    <div id="profileLoading" class="loading-indicator">
+                        <p>Loading your profile information...</p>
+                    </div>
+
+                    <div id="profileContent" style="display: none;">
+                        <form id="profileForm">
+                            <div class="form-group">
+                                <label for="fullName">Full Name</label>
+                                <input type="text" id="fullName" name="fullName" placeholder="Your full name" required readonly>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" name="email" placeholder="Your email address" required readonly>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" name="phone" placeholder="Your phone number" readonly>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="joinDate">Member Since</label>
+                                <input type="text" id="joinDate" name="joinDate" readonly>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" id="editProfileBtn" class="primary-button">Edit Profile</button>
+                                <button type="submit" id="saveProfileBtn" class="primary-button" style="display: none;">Save Changes</button>
+                                <button type="button" id="cancelEditBtn" class="secondary-button" style="display: none;">Cancel</button>
+                                <button type="button" id="logoutBtn" class="danger-button">Logout</button>
+                            </div>
+                        </form>
+                        
+                        <div class="section-divider"></div>
+                        
+                        <div class="change-password-section">
+                            <h3>Change Password</h3>
+                        <form id="changePasswordForm">
+                            <div class="form-group">
+                                <label for="currentPassword">Current Password</label>
+                                <div class="password-input-container">
+                                    <input type="password" id="currentPassword" name="currentPassword" required>
+                                    <button type="button" class="toggle-password" data-target="currentPassword">
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="newPassword">New Password</label>
+                                <div class="password-input-container">
+                                    <input type="password" id="newPassword" name="newPassword" required>
+                                    <button type="button" class="toggle-password" data-target="newPassword">
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="confirmPassword">Confirm New Password</label>
+                                <div class="password-input-container">
+                                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                                    <button type="button" class="toggle-password" data-target="confirmPassword">
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="password-requirements">
+                                <p>Password must contain:</p>
+                                <ul>
+                                    <li id="lengthCheck" class="requirement">
+                                        <span class="policy-icon">❌</span> At least 8 characters
+                                    </li>
+                                    <li id="uppercaseCheck" class="requirement">
+                                        <span class="policy-icon">❌</span> At least one uppercase letter
+                                    </li>
+                                    <li id="lowercaseCheck" class="requirement">
+                                        <span class="policy-icon">❌</span> At least one lowercase letter
+                                    </li>
+                                    <li id="numberCheck" class="requirement">
+                                        <span class="policy-icon">❌</span> At least one number
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="primary-button">Update Password</button>
+                            </div>
+                        </form>
+                        
+                        <div class="section-divider"></div>
+                        
+                        <div class="account-management-section">
+                            <h3>Account Management</h3>
+                            <div class="account-management-actions">
+                                <button type="button" id="deleteAccountBtn" class="danger-button">Delete Account</button>
+                            </div>
+                            
+                            <!-- Delete Account Confirmation -->
+                            <div id="deleteModal" style="display: none; margin-top: 20px;">
+                                <div class="delete-confirmation-box">
+                                    <h4><i class="fas fa-exclamation-triangle"></i> Delete Account</h4>
+                                    <p><strong>Warning:</strong> This action cannot be undone. All your data will be permanently deleted.</p>
+                                    <div class="form-group">
+                                        <label for="deleteConfirmPassword">Enter your password to confirm:</label>
+                                        <div class="password-input-container">
+                                            <input type="password" id="deleteConfirmPassword" name="deleteConfirmPassword" required placeholder="Your current password">
+                                        </div>
+                                    </div>
+                                    <div class="confirmation-actions">
+                                        <button id="cancelDeleteBtn" class="secondary-button"><i class="fas fa-times"></i> Cancel</button>
+                                        <button id="confirmDeleteBtn" class="danger-button"><i class="fas fa-trash-alt"></i> Delete My Account</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/preloader.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/header.js"></script>
+</body>
+
+</html>

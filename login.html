@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+
+<html dir="ltr" lang="EN">
+
+<head>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+    <link href="css/common.css" rel="stylesheet" />
+    <link href="css/login.css" rel="stylesheet" />
+    <link href="css/preloader.css" rel="stylesheet" />
+    <link href="css/responsive.css" rel="stylesheet" />
+    <script type="module" src="js/auth.js?v=2"></script>
+    <script type="module" src="js/login.js?v=2"></script>
+    <title>Login - Plug&amp;Save</title>
+</head>
+
+<body class="login-page">
+    <div class="preloader">
+        <div class="preloader-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="preloader-svg">
+                <path class="preloader-path" d="M10.5 1L2 12h7l-1 11L18 12h-7l1-11z" fill="none" stroke="#4CAF50" stroke-width="1.5" />
+            </svg>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="form-box">
+            <a class="back" href="index.html">← Back to home</a>
+            <h2>Login</h2>
+            <p>Welcome back! Please enter your credentials
+                to access your Plug&amp;Save account and continue managing
+                your energy usage.</p>
+            <form id="loginForm">
+                <label for="loginEmail">Email Address</label>
+                <input id="loginEmail" placeholder="Enter your email" required="True" type="email" />
+                <label for="loginPassword">Password</label>
+                <input id="loginPassword" placeholder="Enter your password" required="True" type="password" />
+                <div class="forgot-password">
+                    <a href="reset.html">Forgot your password?</a>
+                </div>
+                <button class="primary-button" type="submit">Login</button>
+            </form>
+            <p class="login-text">Don't have an account? <button class="navs-button"
+                    onclick="window.location.href='signup.html'">Sign up here</button>
+            </p>
+        </div>
+    </div>
+    <script src="js/preloader.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+
+<html dir="ltr" lang="EN">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+    <link href="css/common.css" rel="stylesheet" />
+    <link href="css/chat-assistant.css" rel="stylesheet" />
+    <link href="css/preloader.css" rel="stylesheet" />
+    <link href="css/responsive.css" rel="stylesheet" />
+    <link href="css/sidebar.css" rel="stylesheet" />
+    <link href="css/header.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="js/auth.js?v=2"></script>
+    <script type="module" src="js/utils.js?v=2"></script>
+    <!-- Using standalone script instead of module for better compatibility -->
+    <script type="module" src="js/chat-standalone.js?v=3"></script>
+    <script type="module" src="js/chat-assistant.js?v=2"></script>
+    <title>AI Chat Assistant - Plug&amp;Save</title>
+</head>
+
+<body class="chat-assistant-page">
+    <div class="preloader">
+        <div class="preloader-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="preloader-svg">
+                <path class="preloader-path" d="M10.5 1L2 12h7l-1 11L18 12h-7l1-11z" fill="none" stroke="#4CAF50" stroke-width="1.5" />
+            </svg>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <button id="menu-toggle" class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="page-title">AI Assistant</div>
+        </div>
+        <div class="header-right">
+            <div class="header-logo">
+                <a href="dashboard.html" class="logo-link">
+                    <div class="icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 28 28" class="logo-svg">
+                            <path d="M10.5 1L2 12h7l-1 11L18 12h-7l1-11z" fill="none" stroke="#4CAF50" stroke-width="1.5" />
+                        </svg>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 28 28" class="logo-svg">
+                        <path d="M10.5 1L2 12h7l-1 11L18 12h-7l1-11z" fill="none" stroke="#4CAF50" stroke-width="1.5" />
+                    </svg>
+                </div>
+                <h1>Plug&amp;Save</h1>
+            </div>
+        </div>
+        <div class="sidebar-menu">
+            <a href="dashboard.html" class="sidebar-menu-item">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="addDevice.html" class="sidebar-menu-item">
+                <i class="fas fa-plus-circle"></i>
+                <span>Add Device</span>
+            </a>
+            <a href="report.html" class="sidebar-menu-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reports</span>
+            </a>
+            <a href="chat-assistant.html" class="sidebar-menu-item active">
+                <i class="fas fa-robot"></i>
+                <span>AI Assistant</span>
+            </a>
+            <a href="profile.html" class="sidebar-menu-item">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="dashboard-content">
+                <div class="dashboard-card chat-container">
+                    <div class="chat-header">
+                        <div class="chat-title">
+                            <i class="fas fa-robot"></i>
+                            <h2>Energy Saving Assistant</h2>
+                        </div>
+                        <div class="chat-subtitle">
+                            Ask me anything about your energy usage, devices, or how to save energy!
+                        </div>
+                    </div>
+                    
+                    <div class="chat-messages" id="chatMessages">
+                        <!-- Messages will be added here dynamically -->
+                    </div>
+                    
+                    <div class="chat-input-container">
+                        <div class="suggested-questions" id="suggestedQuestions">
+                            <button class="suggested-question">How can I reduce my energy bill?</button>
+                            <button class="suggested-question">Which device uses the most energy?</button>
+                            <button class="suggested-question">What are my current savings?</button>
+                        </div>
+                        <div class="chat-input-wrapper">
+                            <textarea id="chatInput" placeholder="Type your message here..." rows="1"></textarea>
+                            <button id="sendMessage" class="send-button">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-card faq-section">
+                    <h3><i class="fas fa-question-circle"></i> Frequently Asked Questions</h3>
+                    <div class="faq-container">
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h4>How does the AI assistant work?</h4>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Our AI assistant uses your device data and energy usage patterns to provide personalized recommendations and answer your questions about energy consumption and savings.</p>
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h4>What kind of questions can I ask?</h4>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>You can ask about your energy usage, device efficiency, tips for saving energy, understanding your bills, and recommendations for optimizing your energy consumption.</p>
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h4>Is my conversation data private?</h4>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Yes, your conversation data is encrypted and stored securely. We use it only to improve your experience and provide better recommendations.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/preloader.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/header.js"></script>
+</body>
+
+</html>

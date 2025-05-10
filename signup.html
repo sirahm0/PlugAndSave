@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <title>Plug&amp;Save - Create Account</title>
+    <link href="css/common.css" rel="stylesheet"/>
+    <link href="css/signup.css" rel="stylesheet"/>
+    <link href="css/preloader.css" rel="stylesheet"/>
+    <link href="css/responsive.css" rel="stylesheet"/>
+    <script type="module" src="js/utils.js?v=2"></script>
+    <script type="module" src="js/auth.js?v=2"></script>
+    <script type="module" src="js/signup.js?v=2"></script>
+</head>
+
+<body class="signup-page">
+    <div class="preloader">
+        <div class="preloader-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="preloader-svg">
+                <path class="preloader-path" d="M10.5 1L2 12h7l-1 11L18 12h-7l1-11z" fill="none" stroke="#4CAF50" stroke-width="1.5" />
+            </svg>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="form-box">
+            <a class="back" href="index.html">← Back to home</a>
+            <h2>Create Account</h2>
+            <p>Join Plug&amp;Save today to start tracking and controlling your device's energy consumption. Fill in
+                the details below to get started and begin saving on your electricity bill!</p>
+            <form id="registrationForm">
+                <label for="fullName">Full Name</label>
+                <input id="fullName" placeholder="Enter your full name" required="" type="text" />
+                <label for="signupEmail">Email Address</label>
+                <input id="signupEmail" placeholder="Enter your email" required="" type="email" />
+                <label for="signupPassword">Password</label>
+                <input id="signupPassword" placeholder="Create a password" required="" type="password" />
+                <div class="password-policy">
+                    <div class="policy-item" id="lengthCheck">
+                        <span class="policy-icon">❌</span>
+                        <span>At least 8 characters</span>
+                    </div>
+                    <div class="policy-item" id="uppercaseCheck">
+                        <span class="policy-icon">❌</span>
+                        <span>Contains uppercase letter</span>
+                    </div>
+                    <div class="policy-item" id="lowercaseCheck">
+                        <span class="policy-icon">❌</span>
+                        <span>Contains lowercase letter</span>
+                    </div>
+                    <div class="policy-item" id="numberCheck">
+                        <span class="policy-icon">❌</span>
+                        <span>Contains number</span>
+                    </div>
+                    <div class="policy-item" id="specialCheck">
+                        <span class="policy-icon">❌</span>
+                        <span>Contains special character</span>
+                    </div>
+                </div>
+
+                <label for="confirmPassword">Confirm Password</label>
+                <input id="confirmPassword" placeholder="Confirm your password" required="" type="password" />
+                <button class="primary-button" type="submit">Create Account</button>
+            </form>
+            <p class="login-text">Already have an account? 
+                <button class="navs-button" onclick="window.location.href='login.html'"> Login </button>
+            </p>
+        </div>
+
+    </div>
+    <script src="js/preloader.js"></script>
+</body>
+
+</html>
