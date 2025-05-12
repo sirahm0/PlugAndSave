@@ -1,103 +1,49 @@
 import { supabase } from './config.js';
 
-// Object containing all DOM element references used throughout the admin panel
+// DOM Elements
 const el = {
-  // Reference to loading spinner element
   loading: document.getElementById('loading'),
-  
-  // Reference to main admin content container
   adminContent: document.getElementById('admin-content'),
-  
-  // Reference to table body where user list will be displayed
   usersTableBody: document.getElementById('users-table-body'),
-  
-  // Reference to logout button
   logoutBtn: document.getElementById('logoutBtn'),
-  
-  // Reference to button that opens create user modal
   createBtn: document.getElementById('createUserBtn'),
-  
-  // Reference to create user modal dialog
   createModal: document.getElementById('createUserModal'),
-  
-  // Reference to form within create user modal
   createForm: document.getElementById('createUserForm'),
-  
-  // Reference to delete user confirmation modal
   deleteModal: document.getElementById('deleteUserModal'),
-  
-  // Hidden input storing ID of user to be deleted
   deleteId: document.getElementById('deleteUserId'),
-  
-  // Button to confirm user deletion
   confirmDeleteBtn: document.getElementById('confirmDeleteBtn'),
-  
-  // Button to cancel user deletion
   cancelDeleteBtn: document.getElementById('cancelDeleteBtn'),
-  
-  // Reference to edit user modal dialog
   editModal: document.getElementById('editUserModal'),
-  
-  // Reference to form within edit user modal
   editForm: document.getElementById('editUserForm'),
-  
-  // Hidden input storing ID of user being edited
   editId: document.getElementById('editUserId'),
-  
-  // Input field for editing user email
   editEmail: document.getElementById('editEmail'),
-  
-  // Input field for editing user full name
   editName: document.getElementById('editFullName'),
-  
-  // Input field for editing user phone number
   editPhone: document.getElementById('editPhone'),
-  
-  // Collection of all modal close buttons
   closeButtons: document.querySelectorAll('.close')
 };
 
-// Utility Functions
-
-// Formats date string to locale format or returns 'N/A' if null
+// Utility functions
 const formatDate = dateString => !dateString ? 'N/A' : new Date(dateString).toLocaleString();
-
-// Sets display style of an HTML element
 const setDisplay = (element, display) => element.style.display = display;
-
-// Shows a modal by setting display to 'block'
 const showModal = modal => setDisplay(modal, 'block');
-
-// Hides a modal by setting display to 'none'
 const hideModal = modal => setDisplay(modal, 'none');
 
-// Function to display notification popups
+// Function to show popup notification
 function showPopup(message, isSuccess = true) {
-  // Find existing popup or create new one
   let popup = document.getElementById('notification-popup');
   if (!popup) {
-    // Create new popup element
     popup = document.createElement('div');
     popup.id = 'notification-popup';
-    // Set popup styling
     popup.style.cssText = 'position:fixed;top:20px;right:20px;padding:15px 25px;border-radius:5px;color:white;z-index:1000;';
-    // Add to document body
     document.body.appendChild(popup);
   }
-  
-  // Set popup message
   popup.textContent = message;
-  // Set color based on success/failure
   popup.style.backgroundColor = isSuccess ? '#4CAF50' : '#F44336';
-  // Show popup
   popup.style.display = 'block';
   
-  // Auto-hide popup after delay
   setTimeout(() => {
-    // Fade out animation
     popup.style.opacity = '0';
     popup.style.transition = 'opacity 0.5s';
-    // Hide after fade
     setTimeout(() => {
       popup.style.display = 'none';
       popup.style.opacity = '1';
@@ -105,34 +51,29 @@ function showPopup(message, isSuccess = true) {
   }, 3000);
 }
 
-// Function to handle errors and optionally redirect
+// Handle API errors
 function handleError(error, context, redirect = false) {
-  // Log error to console
   console.error(`Error ${context}:`, error);
-  // Show error popup to user
   showPopup(`Error ${context}: ${error.message || 'Unknown error'}`, false);
-  // Redirect if URL provided
   if (redirect) setTimeout(() => window.location.href = redirect, 3000);
 }
 
-// Function to verify admin status of current user
+// Function to check if user is admin
 async function checkAdminStatus() {
   try {
-    // Get current session
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
     if (sessionError) throw sessionError;
     
-    // Redirect to login if no session
     if (!session) {
       window.location.href = '/login.html';
       return;
     }
     
-    // Verify user data
+    // Get user data
     const { error: userError } = await supabase.auth.getUser();
     if (userError) throw userError;
     
-    // Check admin status in profiles table
+    // Check if user is an admin by querying the profiles table
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .select('is_admin')
@@ -141,143 +82,104 @@ async function checkAdminStatus() {
     
     if (profileError) throw profileError;
     
-    // Redirect non-admin users
+    // If user is not an admin, redirect to dashboard
     if (!profileData || profileData.is_admin !== true) {
       showPopup('Access denied. Admin privileges required.', false);
       setTimeout(() => window.location.href = '/dashboard.html', 2000);
       return;
     }
     
-    // Show admin interface
+    // User is an admin, show admin content
     setDisplay(el.loading, 'none');
     setDisplay(el.adminContent, 'block');
     showPopup('Welcome, Administrator!', true);
     
-    // Load user list
     loadUsers();
   } catch (error) {
     handleError(error, 'verifying admin status', '/dashboard.html');
   }
 }
 
-// Function to load and display all users
+// Function to load all users
 async function loadUsers() {
   try {
-    // Verify active session
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) throw new Error('No active session found');
     
-    // Get all users from auth.users
-    const { data: authUsers, error: authError } = await supabase.rpc('get_users_with_emails');
+    const { data: profiles, error: profilesError } = await supabase
+      .from('profiles')
+      .select('id, full_name, email, phone, created_at, updated_at')
+      .order('created_at', { ascending: false });
     
-    if (authError) {
-      console.error('Error fetching auth users:', authError);
-      // Fall back to getting just profiles
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, full_name, phone, created_at, updated_at')
-        .order('created_at', { ascending: false });
-      
-      if (profilesError) throw profilesError;
-      
-      // Generate table HTML with no emails
-      el.usersTableBody.innerHTML = !profiles || profiles.length === 0 
-        ? '<tr><td colspan="7" style="text-align:center;">No users found</td></tr>'
-        : profiles.map(user => `
-            <tr>
-              <td>${user.id}</td>
-              <td>${user.full_name || 'N/A'}</td>
-              <td>Email not available</td>
-              <td>${user.phone || 'N/A'}</td>
-              <td>${formatDate(user.created_at)}</td>
-              <td>${formatDate(user.updated_at)}</td>
-              <td>
-                <button class="btn btn-primary edit-user-btn" data-id="${user.id}">Edit</button>
-                <button class="btn btn-danger delete-user-btn" data-id="${user.id}">Delete</button>
-              </td>
-            </tr>
-          `).join('');
-    } else {
-      // Map auth users to a user-friendly format
-      const usersWithEmails = authUsers.map(user => ({
-        id: user.id,
-        full_name: user.raw_user_meta_data?.full_name || 'N/A',
-        email: user.email,
-        phone: user.raw_user_meta_data?.phone || 'N/A',
-        created_at: user.created_at,
-        updated_at: user.updated_at
-      }));
-      
-      // Generate table HTML with emails
-      el.usersTableBody.innerHTML = !usersWithEmails || usersWithEmails.length === 0 
-        ? '<tr><td colspan="7" style="text-align:center;">No users found</td></tr>'
-        : usersWithEmails.map(user => `
-            <tr>
-              <td>${user.id}</td>
-              <td>${user.full_name || 'N/A'}</td>
-              <td>${user.email || 'N/A'}</td>
-              <td>${user.phone || 'N/A'}</td>
-              <td>${formatDate(user.created_at)}</td>
-              <td>${formatDate(user.updated_at)}</td>
-              <td>
-                <button class="btn btn-primary edit-user-btn" data-id="${user.id}">Edit</button>
-                <button class="btn btn-danger delete-user-btn" data-id="${user.id}">Delete</button>
-              </td>
-            </tr>
-          `).join('');
-    }
+    if (profilesError) throw profilesError;
     
-    // Add click handlers to edit buttons
-    document.querySelectorAll('.edit-user-btn').forEach(btn => 
-      btn.addEventListener('click', () => openEditModal(btn.getAttribute('data-id')))
-    );
+    el.usersTableBody.innerHTML = !profiles || profiles.length === 0 
+      ? '<tr><td colspan="7" style="text-align:center;">No users found</td></tr>'
+      : profiles.map(user => `
+          <tr>
+            <td>${user.id}</td>
+            <td>${user.full_name || 'N/A'}</td>
+            <td>${user.email || 'N/A'}</td>
+            <td>${user.phone || 'N/A'}</td>
+            <td>${formatDate(user.created_at)}</td>
+            <td>${formatDate(user.updated_at)}</td>
+            <td>
+              <button class="btn btn-primary edit-user-btn" data-id="${user.id}">Edit</button>
+              <button class="btn btn-danger delete-user-btn" data-id="${user.id}">Delete</button>
+            </td>
+          </tr>
+        `).join('');
     
-    // Add click handlers to delete buttons
+    // Add event listeners to buttons
     document.querySelectorAll('.delete-user-btn').forEach(btn => 
       btn.addEventListener('click', () => openDeleteModal(btn.getAttribute('data-id')))
+    );
+    
+    document.querySelectorAll('.edit-user-btn').forEach(btn => 
+      btn.addEventListener('click', () => openEditModal(btn.getAttribute('data-id')))
     );
   } catch (error) {
     handleError(error, 'loading users');
   }
 }
 
-// Function to create new user
+// Function to create a new user
 async function createUser(event) {
-  // Prevent form submission
   event.preventDefault();
-  // Collect form data
+  
   const userData = {
     email: document.getElementById('newEmail').value,
     password: document.getElementById('newPassword').value,
     fullName: document.getElementById('newFullName').value,
     phone: document.getElementById('newPhone').value
   };
+  
   try {
-    // Get admin session
+    // Get the current session to maintain admin's session
     const { data: { session: adminSession } } = await supabase.auth.getSession();
     if (!adminSession) throw new Error('Admin session not found. Please log in again.');
     
-    // Destructure the response from Supabase's signUp method
-    // 'data' contains the user information if successful
-    // 'error: signUpError' renames the error property to signUpError for clarity
+    // Create user in Supabase Auth
     const { data, error: signUpError } = await supabase.auth.signUp({
-        // The email address for the new user account
-        email: userData.email,
-        // The password for the new user account
-        password: userData.password,
+      email: userData.email,
+      password: userData.password,
+      options: {
+        data: { full_name: userData.fullName },
+        emailRedirectTo: window.location.origin + '/login.html'
+      }
     });
-    // Check if there was an error during sign up
+    
     if (signUpError) throw signUpError;
-    // Verify that we got back user data
-    // This ensures the account was actually created
     if (!data || !data.user) throw new Error('Failed to create user account');
-    // Get current timestamp
+    
     const timestamp = new Date().toISOString();
-    // Create user profile
+    
+    // Insert email into profiles manually without a trigger
     const { error: profileError } = await supabase
       .from('profiles')
       .insert([{
         id: data.user.id,
+        email: userData.email,
         full_name: userData.fullName,
         phone: userData.phone,
         is_admin: false,
@@ -286,153 +188,183 @@ async function createUser(event) {
       }]);
     
     if (profileError) throw profileError;
+    
     // Restore admin session
     await supabase.auth.setSession({
       access_token: adminSession.access_token,
       refresh_token: adminSession.refresh_token
     });
-    // Reset and close form
+    
+    // Close modal and reset form
     hideModal(el.createModal);
     el.createForm.reset();
-    // Show success message and refresh user list
-    showPopup('User created successfully!', true);
-    loadUsers();
     
+    showPopup('User created successfully', true);
+    loadUsers();
   } catch (error) {
     handleError(error, 'creating user');
   }
 }
 
-// Function to open delete confirmation modal
+// Function to open delete modal
 function openDeleteModal(userId) {
-  // Store user ID and show modal
   el.deleteId.value = userId;
   showModal(el.deleteModal);
 }
 
 // Function to delete user
 async function deleteUser() {
+  const userId = el.deleteId.value;
+  
   try {
-    // Get user ID from hidden input
-    const userId = el.deleteId.value;
-    // Delete user profile
+    // Get current session to ensure we have admin privileges
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session) throw new Error('Not authenticated. Please log in.');
+    
+    // First delete from profiles table
     const { error: profileError } = await supabase
       .from('profiles')
       .delete()
       .eq('id', userId);
+      
     if (profileError) throw profileError;
-    // Delete user auth account
-    const { error: authError } = await supabase.auth.admin.deleteUser(userId);
-    if (authError) throw authError;
-    // Hide modal and show success
-    hideModal(el.deleteModal);
-    showPopup('User deleted successfully!', true);
-    // Refresh user list
-    loadUsers();
+    
+    // Delete from auth.users using Edge Function
+    try {
+      const token = session.access_token;
+      if (!token) throw new Error('No access token available. Please log in again.');
+      
+      const response = await fetch("https://fzrxktbxjbcmbudiouqa.functions.supabase.co/admin-delete-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ user_id: userId })
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Server returned ${response.status}: ${errorText}`);
+      }
+      
+      const result = await response.json();
+      if (!result.success) throw new Error(result.error || 'Error deleting account from auth.users');
+      
+      hideModal(el.deleteModal);
+      showPopup('User completely deleted from the system', true);
+      loadUsers();
+    } catch (fetchError) {
+      console.error('Error deleting from auth.users:', fetchError);
+      
+      // Even if auth.users deletion fails, we've already deleted from profiles
+      hideModal(el.deleteModal);
+      showPopup('User profile deleted, but could not remove from authentication system: ' + fetchError.message, false);
+      loadUsers();
+    }
   } catch (error) {
+    console.error('Error deleting user:', error);
     handleError(error, 'deleting user');
   }
 }
 
-// Function to open edit user modal
+// Function to open edit modal
 async function openEditModal(userId) {
   try {
-    // Get user profile data
-    const { data: profile, error: profileError } = await supabase
+    // Get user data
+    const { data: user, error } = await supabase
       .from('profiles')
-      .select('full_name, phone')
+      .select('id, email, full_name, phone')
       .eq('id', userId)
       .single();
       
-    if (profileError) throw profileError;
-    
-    // Try to get user email from auth.users
-    const { data: userData, error: userError } = await supabase.rpc('get_user_email', { user_id: userId });
-    let email = 'Email not available';
-    
-    if (!userError && userData && userData.length > 0) {
-      email = userData[0].email;
-    }
+    if (error) throw error;
     
     // Populate form fields
-    el.editId.value = userId;
-    el.editEmail.value = email;
-    el.editName.value = profile.full_name || '';
-    el.editPhone.value = profile.phone || '';
+    el.editId.value = user.id;
+    el.editEmail.value = user.email || '';
+    el.editName.value = user.full_name || '';
+    el.editPhone.value = user.phone || '';
     
-    // Show modal
     showModal(el.editModal);
-    
   } catch (error) {
     handleError(error, 'loading user data');
   }
 }
 
-// Function to update user details
+// Function to edit user
 async function editUser(event) {
-  // Prevent form submission
   event.preventDefault();
   
+  const userId = el.editId.value;
+  const userData = {
+    fullName: el.editName.value,
+    phone: el.editPhone.value
+  };
+  
   try {
-    // Get user ID and updated data
-    const userId = el.editId.value;
-    const updates = {
-      full_name: el.editName.value,
-      phone: el.editPhone.value,
-      updated_at: new Date().toISOString()
-    };
-    
-    // Update profile in database
-    const { error: updateError } = await supabase
+    // Update profile with the new data
+    const { error: profileError } = await supabase
       .from('profiles')
-      .update(updates)
+      .update({
+        full_name: userData.fullName,
+        phone: userData.phone,
+        updated_at: new Date().toISOString()
+      })
       .eq('id', userId);
-      
-    if (updateError) throw updateError;
     
-    // Hide modal and show success
+    if (profileError) throw profileError;
+    
     hideModal(el.editModal);
-    showPopup('User updated successfully!', true);
+    el.editForm.reset();
     
-    // Refresh user list
+    showPopup('User updated successfully', true);
     loadUsers();
-    
   } catch (error) {
-    handleError(error, 'updating user');
+    console.error('Error updating user:', error);
+    handleError(error, 'editing user');
   }
 }
 
-// Function to handle user logout
+// Handle logout
 async function handleLogout() {
   try {
-    // Sign out user
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
     
-    // Redirect to login page
-    window.location.href = '/login.html';
-    
+    showPopup('Logged out successfully');
+    setTimeout(() => window.location.href = '/login.html', 1500);
   } catch (error) {
     handleError(error, 'logging out');
   }
 }
 
-// Initialize admin panel
+// Initialize the app
 (function init() {
-  // Check admin status when page loads
-  checkAdminStatus();
+  // Main functionality
+  document.addEventListener('DOMContentLoaded', checkAdminStatus);
+  el.logoutBtn.addEventListener('click', handleLogout);
+  el.createForm.addEventListener('submit', createUser);
+  el.confirmDeleteBtn.addEventListener('click', deleteUser);
+  el.editForm.addEventListener('submit', editUser);
   
-  // Add event listeners
-  el.logoutBtn?.addEventListener('click', handleLogout);
-  el.createForm?.addEventListener('submit', createUser);
-  el.editForm?.addEventListener('submit', editUser);
-  el.confirmDeleteBtn?.addEventListener('click', deleteUser);
-  el.cancelDeleteBtn?.addEventListener('click', () => hideModal(el.deleteModal));
-  el.closeButtons?.forEach(button => {
+  // Modal controls
+  el.createBtn.addEventListener('click', () => showModal(el.createModal));
+  el.cancelDeleteBtn.addEventListener('click', () => hideModal(el.deleteModal));
+  
+  // Close buttons
+  el.closeButtons.forEach(button => {
     button.addEventListener('click', () => {
       hideModal(el.createModal);
-      hideModal(el.editModal);
       hideModal(el.deleteModal);
+      hideModal(el.editModal);
     });
   });
+  
+  // Close modals when clicking outside
+  window.onclick = (event) => {
+    if (event.target === el.createModal) hideModal(el.createModal);
+    if (event.target === el.deleteModal) hideModal(el.deleteModal);
+    if (event.target === el.editModal) hideModal(el.editModal);
+  };
 })();
