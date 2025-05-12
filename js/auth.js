@@ -1,32 +1,25 @@
 // Supabase Authentication Module
 import { supabase } from './config.js'
 
-// Function to display notification messages to users
+// Function to show popup notification
 function showPopup(message, isSuccess = true) {
-    // Find existing popup or create a new one if it doesn't exist
+    // Create popup element if it doesn't exist
     let popup = document.getElementById('notification-popup');
     if (!popup) {
-        // Create new popup element
         popup = document.createElement('div');
-        // Set unique identifier
         popup.id = 'notification-popup';
-        // Add CSS class for styling
         popup.className = 'popup';
-        // Add popup to the page
         document.body.appendChild(popup);
     }
 
-    // Set the message text and apply success/error styling
+    // Set popup content and style
     popup.textContent = message;
     popup.className = 'popup ' + (isSuccess ? 'success' : 'error');
-    // Make popup visible
     popup.style.display = 'block';
 
-    // Automatically hide popup after delay
+    // Hide popup after 3 seconds
     setTimeout(() => {
-        // Start fade out animation
         popup.style.animation = 'fadeOut 0.5s ease-in-out';
-        // Remove popup after animation
         setTimeout(() => {
             popup.style.display = 'none';
             popup.style.animation = '';
@@ -34,12 +27,11 @@ function showPopup(message, isSuccess = true) {
     }, 3000);
 }
 
-// Function to convert technical error messages into user-friendly messages
+// Function to get user-friendly error message
 function getErrorMessage(error) {
-    // Get the error message or use default if none provided
     const errorMessage = error.message || 'An error occurred';
     
-    // Convert common technical errors into user-friendly messages
+    // Map common error messages to user-friendly versions
     if (errorMessage.includes('Invalid login credentials')) {
         return 'Invalid email or password.';
     } else if (errorMessage.includes('Email not confirmed')) {
@@ -50,67 +42,63 @@ function getErrorMessage(error) {
         return 'Network error. Please check your connection.';
     }
     
-    // Return original message if no specific translation exists
     return errorMessage;
 }
 
-// Function to handle new user registration
+// Function to sign up a user with username, email and password
 async function signUp(username, email, password) {
     try {
-        // Validate that all required fields are provided
+        // Validate input
         if (!username || !email || !password) {
             showPopup('Please fill in all fields', false);
             return;
         }
-        // Attempt to create new user account in Supabase
+        
+        // Create user with email, password, and username as metadata
         const { data, error } = await supabase.auth.signUp({
             email: email,
             password: password,
             options: {
-                // Store username in user metadata
                 data: {
                     username: username
                 }
             }
         });
-        // Handle any signup errors
+        
         if (error) throw error;
-        // Extract user data and log success
+        
+        // Registration successful
         const user = data.user;
         console.log("Registration successful:", user.email);
         showPopup('Registration successful!');
         
-        // Redirect to dashboard after brief delay
+        // Redirect to dashboard after a short delay
         setTimeout(() => {
             window.location.href = 'dashboard.html';
         }, 1500);
     } catch (error) {
-        // Log and display any errors that occur
         console.error("Registration error:", error);
         showPopup(error.message, false);
     }
 }
 
-// Function to handle user login
+// Function to sign in a user with email and password
 async function signIn(email, password) {
     try {
-        // Attempt to sign in with provided credentials
         const { data, error } = await supabase.auth.signInWithPassword({
             email: email,
             password: password
         });
         
-        // Handle any login errors
         if (error) throw error;
         
-        // Extract user data and log success
+        // Login successful
         const user = data.user;
         console.log("Login successful:", user.email);
         showPopup('Login successful!');
         
-        // Check if the user has admin privileges
+        // Check if user is admin
         try {
-            // Query the profiles table for admin status
             const { data: profileData, error: profileError } = await supabase
                 .from('profiles')
                 .select('is_admin')
@@ -119,106 +107,93 @@ async function signIn(email, password) {
                 
             if (profileError) throw profileError;
             
-            // Redirect user based on their admin status
+            // Redirect based on admin status
             setTimeout(() => {
                 if (profileData && profileData.is_admin === true) {
-                    // Redirect admins to admin panel
+                    // User is admin, redirect to admin page
                     window.location.href = 'admin.html';
                 } else {
-                    // Redirect regular users to dashboard
+                    // User is not admin, redirect to dashboard
                     window.location.href = 'dashboard.html';
                 }
             }, 1500);
         } catch (profileError) {
-            // Log admin check errors and default to dashboard
             console.error('Error checking admin status:', profileError);
+            // Default to dashboard if there's an error checking admin status
             setTimeout(() => {
                 window.location.href = 'dashboard.html';
             }, 1500);
         }
     } catch (error) {
-        // Log and display any login errors
         console.error("Login error:", error);
         const errorMessage = getErrorMessage(error);
         showPopup(errorMessage, false);
     }
 }
 
-// Make authentication functions available globally for use in HTML
-// Allows these functions to be called directly from HTML elements
-// Without this, the functions would be scoped only to the auth.js 
-// file and not accessible from HTML
+// Make auth functions available globally
 window.signUp = signUp;
 window.signIn = signIn;
 
-// Initialize authentication handling when page loads
+// Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', async () => {
-    // Log current page for debugging
+    // Debug: Log current page
     const currentPage = window.location.pathname;
     console.log("Current page:", currentPage);
 
-    // Check user's authentication status
+    // Check if user is already logged in
     supabase.auth.getSession().then(({ data, error }) => {
         console.log("Auth state checked:", data.session ? "User logged in" : "No user");
         
-        // Get user data if session exists
         const user = data.session?.user;
         
-        // Handle homepage routing
-        // If user is logged in → Send to dashboard
-        // If not logged in → Stay on homepage
+        // Handle homepage
         if (currentPage.includes('index.html')) {
             if (user) {
-                // Redirect logged-in users to dashboard
+                // User is signed in, redirect to dashboard
                 window.location.href = 'dashboard.html';
             }
             return;
         }
 
-        // Handle dashboard page access
+        // Handle dashboard page
         if (currentPage.includes('dashboard.html')) {
             if (user) {
-                // Show dashboard content for logged-in users
-                // Hiding a "Loading..." spinner after the page finishes 
-                // checking if the user is logged in.
+                // User is signed in
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('userContent').style.display = 'block';
                 
-                // Display user information
+                // Get user details - try to use username from metadata if available
                 const username = user.user_metadata?.username || user.email;
                 document.getElementById('userEmail').textContent = username;
                 document.getElementById("welcomeUser").innerText = `Welcome, ${username}!`;
             } else {
-                // Redirect to login if not authenticated
+                // User is signed out, redirect to login
                 window.location.href = 'login.html';
             }
             return;
         }
 
-        // Handle device details page access
+        // Handle device details page
         if (currentPage.includes('device-details.html')) {
             if (!user) {
-                // Redirect to login if not authenticated
+                // User is signed out, redirect to login
                 window.location.href = 'login.html';
                 return;
             }
             return;
         }
 
-        // Handle login page access
+        // Handle login page
         if (currentPage.includes('login.html')) {
             if (user) {
-                // Redirect to dashboard if already logged in
+                // User is already logged in, redirect to dashboard
                 window.location.href = 'dashboard.html';
                 return;
             }
 
-            // Set up login form submission handler
             const loginForm = document.getElementById('loginForm');
-            // Makes sure the login form exists before trying to use it
             if (loginForm) {
-                //Watches for when user submits the form (clicks login button or hits enter)
-                //(e) => is the function that runs when form is submitted
                 loginForm.addEventListener('submit', (e) => {
                     e.preventDefault();
                     console.log("Login form submitted");
